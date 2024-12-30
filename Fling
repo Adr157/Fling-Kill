@@ -1,5 +1,4 @@
 -- player fling gui
-
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 
@@ -69,9 +68,11 @@ local function SkidFling(TargetPlayer)
         if RootPart.Velocity.Magnitude < 50 then
             getgenv().OldPos = RootPart.CFrame
         end
+        -- Modificação para garantir que o fling funcione mesmo se o jogador estiver sentado
         if THumanoid and THumanoid.Sit then
-            return Message("Error Occurred", "Target is sitting", 5)
+            THumanoid.Sit = false  -- Forçar o jogador a sair da posição sentado
         end
+
         if THead then
             workspace.CurrentCamera.CameraSubject = THead
         elseif Handle then
@@ -79,6 +80,7 @@ local function SkidFling(TargetPlayer)
         else
             workspace.CurrentCamera.CameraSubject = THumanoid
         end
+        
         if not TCharacter:FindFirstChildWhichIsA("BasePart") then
             return
         end
@@ -86,8 +88,8 @@ local function SkidFling(TargetPlayer)
         local function FPos(BasePart, Pos, Ang)
             RootPart.CFrame = CFrame.new(BasePart.Position) * Pos * Ang
             Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Pos * Ang)
-            RootPart.Velocity = Vector3.new(9e7, 9e7 * 10, 9e7)
-            RootPart.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
+            RootPart.Velocity = Vector3.new(5e12, 5e12, 5e12)  -- Força extremamente maior
+            RootPart.RotVelocity = Vector3.new(5e13, 5e13, 5e13)  -- Torna a rotação igualmente destrutiva
         end
         
         local function SFBasePart(BasePart)
@@ -100,7 +102,7 @@ local function SkidFling(TargetPlayer)
                     if BasePart.Velocity.Magnitude < 50 then
                         Angle = Angle + 100
 
-                        FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle),0 ,0))
+                        FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 0.75, CFrame.Angles(math.rad(Angle), 0, 0))
                         task.wait()
 
                         FPos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
@@ -159,7 +161,7 @@ local function SkidFling(TargetPlayer)
         local BV = Instance.new("BodyVelocity")
         BV.Name = "EpixVel"
         BV.Parent = RootPart
-        BV.Velocity = Vector3.new(9e8, 9e8, 9e8)
+        BV.Velocity = Vector3.new(5e13, 5e13, 5e13)  -- Maior velocidade
         BV.MaxForce = Vector3.new(1/0, 1/0, 1/0)
         
         Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
