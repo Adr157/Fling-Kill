@@ -88,8 +88,8 @@ local function SkidFling(TargetPlayer)
         local function FPos(BasePart, Pos, Ang)
             RootPart.CFrame = CFrame.new(BasePart.Position) * Pos * Ang
             Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Pos * Ang)
-            RootPart.Velocity = Vector3.new(5e12, 5e12, 5e12)  -- Força extremamente maior
-            RootPart.RotVelocity = Vector3.new(5e13, 5e13, 5e13)  -- Torna a rotação igualmente destrutiva
+            RootPart.Velocity = Vector3.new(1e12, 1e12, 1e12)  -- Força extremamente maior
+            RootPart.RotVelocity = Vector3.new(1e13, 1e13, 1e13)  -- Torna a rotação igualmente destrutiva
         end
         
         local function SFBasePart(BasePart)
@@ -102,7 +102,7 @@ local function SkidFling(TargetPlayer)
                     if BasePart.Velocity.Magnitude < 50 then
                         Angle = Angle + 100
 
-                        FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 0.75, CFrame.Angles(math.rad(Angle), 0, 0))
+                        FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle),0 ,0))
                         task.wait()
 
                         FPos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
@@ -161,7 +161,7 @@ local function SkidFling(TargetPlayer)
         local BV = Instance.new("BodyVelocity")
         BV.Name = "EpixVel"
         BV.Parent = RootPart
-        BV.Velocity = Vector3.new(5e13, 5e13, 5e13)  -- Maior velocidade
+        BV.Velocity = Vector3.new(1e13, 1e13, 1e13)  -- Usando valores ainda mais fortes
         BV.MaxForce = Vector3.new(1/0, 1/0, 1/0)
         
         Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
