@@ -23,6 +23,7 @@ TextBox.Position = UDim2.new(0.1, 0, 0.2, 0)
 TextBox.Size = UDim2.new(0.8, 0, 0.2, 0)
 TextBox.Font = Enum.Font.SourceSans
 TextBox.PlaceholderText = "Enter username"
+TextBox.PlaceholderText = "Enter username or type 'all' for everyone"
 TextBox.Text = ""
 TextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
 TextBox.TextSize = 14
@@ -51,24 +52,6 @@ end
 local function Message(_Title, _Text, Time)
     game:GetService("StarterGui"):SetCore("SendNotification", {Title = _Title, Text = _Text, Duration = Time})
 end
-
-
-local function DisplayProgressBar()
-    local progressGui = Instance.new("ScreenGui", Player.PlayerGui)
-    local progressBar = Instance.new("Frame", progressGui)
-    local bar = Instance.new("Frame", progressBar)
-
-    progressBar.Size = UDim2.new(0.4, 0, 0.05, 0)
-    progressBar.Position = UDim2.new(0.3, 0, 0.9, 0)
-    progressBar.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-
-    bar.Size = UDim2.new(0, 0, 1, 0)
-    bar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-    bar:TweenSize(UDim2.new(1, 0, 1, 0), "Out", "Linear", 3, true, function()
-        progressGui:Destroy()
-    end)
-end
-
 
 local function SkidFling(TargetPlayer)
     local Character = Player.Character
@@ -106,8 +89,8 @@ local function SkidFling(TargetPlayer)
         local function FPos(BasePart, Pos, Ang)
             RootPart.CFrame = CFrame.new(BasePart.Position) * Pos * Ang
             Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Pos * Ang)
-            RootPart.Velocity = Vector3.new(1e12, 1e12, 1e12)  -- Força extremamente maior
-            RootPart.RotVelocity = Vector3.new(1e13, 1e13, 1e13)  -- Torna a rotação igualmente destrutiva
+            RootPart.Velocity = Vector3.new(1e15, 1e15, 1e15)  -- Força extremamente maior
+            RootPart.RotVelocity = Vector3.new(1e16, 1e16, 1e16)  -- Torna a rotação igualmente destrutiva
         end
         
         local function SFBasePart(BasePart)
@@ -179,7 +162,7 @@ local function SkidFling(TargetPlayer)
         local BV = Instance.new("BodyVelocity")
         BV.Name = "EpixVel"
         BV.Parent = RootPart
-        BV.Velocity = Vector3.new(1e13, 1e13, 1e13)  -- Usando valores ainda mais fortes
+        BV.Velocity = Vector3.new(1e16, 1e16, 1e16)  -- Usando valores ainda mais fortes
         BV.MaxForce = Vector3.new(1/0, 1/0, 1/0)
         
         Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
@@ -223,17 +206,6 @@ end
 
 TextButton.MouseButton1Click:Connect(function()
     local targetName = TextBox.Text
-    
-    if targetName == "all" then
-        local allPlayers = Players:GetPlayers()
-        table.remove(allPlayers, table.find(allPlayers, Player)) -- Remover jogador local
-        for _, TargetPlayer in ipairs(allPlayers) do
-            SkidFling(TargetPlayer)
-            task.wait(0.1) -- Intervalo rápido entre flings
-        end
-        DisplayProgressBar()
-        Message("Fling Iniciado", "Todos os jogadores foram atingidos!", 3)
-    else
     local targetPlayer = GetPlayer(targetName)
 
     if targetPlayer then
@@ -241,4 +213,51 @@ TextButton.MouseButton1Click:Connect(function()
     else
         Message("Error Occurred", "Invalid username", 5)
     end
+end)
+local function FlingAll()
+    for _, targetPlayer in pairs(Players:GetPlayers()) do
+        if targetPlayer ~= Player then
+            SkidFling(targetPlayer)
+            task.wait(0.1) -- Pequeno delay entre cada fling
+        end
+    end
+end
+
+TextButton.MouseButton1Click:Connect(function()
+    local targetName = TextBox.Text:lower()
+
+    if targetName == "all" then
+        FlingAll()
+        Message("Fling iniciado", "Todos os jogadores estão sendo jogados!", 5)
+    else
+        local targetPlayer = GetPlayer(targetName)
+        if targetPlayer then
+            SkidFling(targetPlayer)
+        else
+            Message("Error Occurred", "Invalid username", 5)
+        end
+    end
+end)
+
+local function ShowProgressBar()
+    local TweenService = game:GetService("TweenService")
+    local ProgressGui = Instance.new("ScreenGui")
+    local ProgressFrame = Instance.new("Frame")
+    
+    ProgressGui.Parent = Player:WaitForChild("PlayerGui")
+    
+    ProgressFrame.Parent = ProgressGui
+    ProgressFrame.Size = UDim2.new(0, 300, 0, 20)
+    ProgressFrame.Position = UDim2.new(0.5, -150, 0.1, 0)
+    ProgressFrame.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    
+    local Tween = TweenService:Create(ProgressFrame, TweenInfo.new(3), {Size = UDim2.new(0, 0, 0, 20)})
+    Tween:Play()
+    Tween.Completed:Connect(function()
+        ProgressGui:Destroy()
+    end)
+end
+
+TextButton.MouseButton1Click:Connect(function()
+    ShowProgressBar()
 end)
